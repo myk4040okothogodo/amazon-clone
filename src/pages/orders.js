@@ -5,10 +5,10 @@ import db from "../../firebase";
 import Order from "../components/Order";
 
 
-function Orders({orders}) {
-  const [session] = useSession();
+function Orders({ orders }) {
+  const { session } = useSession();
 
-
+  console.log(orders);
   return (
     <div>
       <Header />
@@ -16,7 +16,7 @@ function Orders({orders}) {
         <h1 className="text-3xl border-b mb-2 pb-1 border-yellow-400">
           Yours Orders
         </h1>
-    {session ? (
+    { session ? (
       <h2>{orders.length} orders</h2>
     ) : (
       <h2>Please sign in to see your orders</h2>
@@ -26,6 +26,7 @@ function Orders({orders}) {
         {orders?.map(({id, amount, items, timestamp, images}) => (
           <Order 
             key={id}
+            id = {id}
             amount={amount}
             items={items}
             timestamp={timestamp}
@@ -53,16 +54,18 @@ export async function getServerSideProps(context) {
     }
 
     // Firebase db
-    const stripeOrders = db
+    const stripeOrders = await db
       .collection('users')
       .doc(session.user.email)
       .collection('orders')
       .orderBy('timestamp', 'desc')
       .get();
 
+
+    console.log("StripeOrders :", stripeOrders);
     // Stripe orders
     const orders = await Promise.all(
-      stripeOrders.docs?.map(async(order) => ({
+      stripeOrders.docs.map(async (order) => ({
         id: order.id,
         amount: order.data().amount,
         images: order.data().images,

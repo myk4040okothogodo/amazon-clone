@@ -15,7 +15,8 @@ export default async(req, res) => {
         },
       },
     }));
-  
+
+
    const session = await stripe.checkout.sessions.create({
      shipping_address_collection: {
         allowed_countries: ["GB", "US", "CA"],
